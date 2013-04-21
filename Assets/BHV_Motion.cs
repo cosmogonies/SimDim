@@ -1,11 +1,13 @@
 using UnityEngine;
 using System.Collections;
 
-public class BHV_Walk : MonoBehaviour {
+public class BHV_Motion : MonoBehaviour {
 	
 	public float StepLength=1.0f; // speed
 	
 	private Vector3 prevousDirection = Vector3.zero; //internal use for random walk
+	
+	public Vector3 currentGoal = Vector3.zero;
 	
 	// Use this for initialization
 	void Start () 
@@ -33,13 +35,15 @@ public class BHV_Walk : MonoBehaviour {
 	
 	public void walkAtRandom()
 	{	
+		this.currentGoal = Vector3.zero;
+		
 		//Do not fall at the end of the world!
 		
 		if( Mathf.Abs(this.gameObject.transform.position.x)>125)
-			this.prevousDirection.x *= -1;
+			this.prevousDirection.x *= - Time.deltaTime;
 		
 		if( Mathf.Abs(this.gameObject.transform.position.z)>125)
-			this.prevousDirection.z *= -1;
+			this.prevousDirection.z *= - Time.deltaTime;
 		
 		Vector3 OffSet = giveRandomDirection();
 		if(prevousDirection == Vector3.zero)
@@ -56,7 +60,7 @@ public class BHV_Walk : MonoBehaviour {
 			//this.transform.Translate(this.prevousDirection + OffSet*0.1f, Space.World);
 			
 			this.gameObject.transform.LookAt( this.gameObject.transform.position + OffSet);
-			this.gameObject.transform.Translate(0,0,StepLength,Space.Self);
+			this.gameObject.transform.Translate(0,0,StepLength*Time.deltaTime,Space.Self);
 			
 		}
 			
@@ -69,20 +73,24 @@ public class BHV_Walk : MonoBehaviour {
 		float DistanceToGoal = delta.magnitude;
 		
 		this.prevousDirection = delta;
-//		if(DistanceToGoal<StepLength)
-//		{
-//			Debug.Log ("goal reached");
-//			return StepLength;
-//		}
-//		else
-//		{
-			this.gameObject.transform.LookAt(_Goal);
-			
-			//this.gameObject.transform.Translate(delta.normalized*StepLength,Space.World);
-			this.gameObject.transform.Translate(0,0,StepLength,Space.Self);
 		
-			return DistanceToGoal;
-		//}
+		this.gameObject.transform.LookAt(_Goal);
+		
+		//this.gameObject.transform.Translate(delta.normalized*StepLength,Space.World);
+		this.gameObject.transform.Translate(0,0,StepLength*Time.deltaTime,Space.Self);
+	
+		
+
+		this.currentGoal = _Goal;
+		
+		return DistanceToGoal;
+	}
+	
+	public void OnGUI()
+	{
+		if(this.currentGoal!= Vector3.zero)
+			Debug.DrawLine(this.transform.position, this.currentGoal, Color.cyan);
+		
 		
 	}
 	

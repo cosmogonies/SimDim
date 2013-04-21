@@ -9,7 +9,7 @@ namespace SimDim
 	public class Dimension
 	{
 		public float SCALING=100.0f; //to be in readonly
-		public int Rank;//to be in readonly: get pattern
+		public int Rank;//to be in readonly: get design pattern
 		
 		public string Name;
 		
@@ -32,11 +32,11 @@ namespace SimDim
 		}
 		
 		public void destroyMatter(SimDim.Food _Target)  //later do it with Matter
-		{	//as we can NOT destroy bojects, lets remove them for sights:
+		{	//as we can NOT destroy objects, lets remove them for sights:
 			
 			foreach( Matter currentItem in this.Population)
 			{
-				BHV_See currentSight = currentItem.root.GetComponent<BHV_See>() as BHV_See;
+				BHV_Vision currentSight = currentItem.root.GetComponent<BHV_Vision>() as BHV_Vision;
 				if(currentSight != null)
 				{
 					currentSight.currentVision.Remove(_Target);
@@ -44,8 +44,7 @@ namespace SimDim
 					
 				}
 			}
-		}
-		
+		}		
 	}
 	
 	
@@ -63,10 +62,9 @@ namespace SimDim
 			Material blackMat = new Material(Shader.Find("Diffuse"));
 			blackMat.color = Color.black;
 			PlanGizmo.renderer.material = blackMat;
-		
 		}
-		
 	}
+	
 	public class Line : Dimension
 	{
 		public Line(string _Name) : base(1)
@@ -98,22 +96,17 @@ namespace SimDim
 	
 	public class Food:Matter
 	{
-		//GameObject Shape;
-		
 		public Food(Dimension _Dim):base(_Dim)
 		{
 			GameObject shape = UnityEngine.GameObject.CreatePrimitive(PrimitiveType.Cube) ;
 			this.Body.Add( shape );
 			shape.transform.parent = this.root.transform;
 			
-			//this.Shape.transform.localScale *= 0.1f;
 			this.root.name="food_"+_Dim.Population.Count;
-			
 			
 			//Debug.Log ( System.Guid.NewGuid() );
 			//this.root.transform.localScale *= 0.1f;
 			this.root.transform.position = _Dim.giveAvailableLocation();
-			// this.root.transform.localScale*= 0.1f;
 			
 			//Temporarily, shading them in red to see them better.
 			Material redMat = new Material(Shader.Find("Diffuse"));
@@ -143,17 +136,9 @@ namespace SimDim
 		//Dictionary<int,float> Ugliness;
 		public string Name;
 		public Dimension belonging;
-		
-		
+			
 		GameObject Eye;
 		private float DEFAULT_SCALE = 10.0f;
-		
-//		public LivingCreature(Dimension _Dim):base(_Dim)
-//		{
-//			this.belonging = _Dim;
-//			//Randomly Creation
-//			//this.
-//		}
 		
 		public LivingCreature(Dimension _Dim, int _NbSide):base(_Dim)
 		{
@@ -165,27 +150,7 @@ namespace SimDim
 			
 			this.createShape();
 			
-			if(_NbSide == 4)
-			{	
-//				//Eye shape creation
-//				GameObject EyeShape = UnityEngine.GameObject.CreatePrimitive(PrimitiveType.Cube);
-//				EyeShape.transform.parent = this.root.transform;
-//				EyeShape.name="Square_Eye";
-//				EyeShape.transform.localScale *= 0.1f;
-//				EyeShape.transform.Translate(1.0f,0.0f,1.0f);
-//				this.Body.Add( EyeShape );
-//				this.Eye = EyeShape;
-	
-//				BHV_FSMBrain_Square newBehaviour  = this.root.AddComponent<BHV_FSMBrain_Square>() as BHV_FSMBrain_Square;
-//				newBehaviour.Start();
-//				newBehaviour.Sight.TheEye = EyeShape;
-				
-				//brainify();
-				//BHV_FSMBrain_Square newBehaviour  = this.root.AddComponent<BHV_FSMBrain_Square>() as BHV_FSMBrain_Square;
-				//newBehaviour.theLivingCreature = this;
-				
-			}	
-			BHV_FSMBrain_Square newBehaviour  = this.root.AddComponent<BHV_FSMBrain_Square>() as BHV_FSMBrain_Square;
+			BHV_FSMBrain newBehaviour  = this.root.AddComponent<BHV_FSMBrain>() as BHV_FSMBrain;
 			newBehaviour.theLivingCreature = this;
 				
 			//find a place.
@@ -195,7 +160,7 @@ namespace SimDim
 		private void giveSightBehaviour(GameObject _Eye)
 		{//Every living create can see others.
 			
-			BHV_See newBehaviour  = this.root.AddComponent<BHV_See>() as BHV_See;
+			BHV_Vision newBehaviour  = this.root.AddComponent<BHV_Vision>() as BHV_Vision;
 			newBehaviour.TheEye = _Eye;
 			newBehaviour.Belonging = this.belonging;
 		}
@@ -216,8 +181,6 @@ namespace SimDim
 				this.root.name="Pentagon"+this.belonging.Population.Count;
 				this.NbSide = UnityEngine.Random.Range(5,10);
 			}
-			
-			//this.Body.Add( shape );
 			
 			// SHAPE CREATION
 			float radius =1.0f;
@@ -244,30 +207,26 @@ namespace SimDim
 					//Debug.Log(i+" "+nextIndex);
 					Vector3 offset = (AngleCoord[nextIndex] - AngleCoord[i] ) / this.DEFAULT_SCALE;
 					
-					GameObject toto = UnityEngine.GameObject.CreatePrimitive(PrimitiveType.Cube);
-					toto.name = this.root.name+"_Sub_"+i+"x"+j;
-					toto.transform.position = AngleCoord[i] + j*offset;
-					toto.transform.parent = this.root.transform;	
-					toto.transform.localScale *= 0.1f;
+					GameObject SubShape = UnityEngine.GameObject.CreatePrimitive(PrimitiveType.Cube);
+					SubShape.name = this.root.name+"_Sub_"+i+"x"+j;
+					SubShape.transform.position = AngleCoord[i] + j*offset;
+					SubShape.transform.parent = this.root.transform;	
+					SubShape.transform.localScale *= 0.1f;
 					
 					//Temporarily, shading them in Green to see them better.
 					Material greenMat = new Material(Shader.Find("Diffuse"));
 					greenMat.color = Color.green;
-					toto.renderer.material = greenMat;						
+					SubShape.renderer.material = greenMat;						
 					
-					this.Body.Add( toto );
+					this.Body.Add( SubShape );
 				}	
 			}
 			this.root.transform.position = this.belonging.giveAvailableLocation();
 			
 		}
-			
-		
 	}
 	
-	
 	//Create Square
-	
 	public class SquareCreature : LivingCreature
 	{
 		public SquareCreature(Dimension _Dim): base(_Dim,4)
@@ -305,9 +264,6 @@ namespace SimDim
 			//Get a Job
 		}
 	}	
-	
-	
-	
 }
 
 

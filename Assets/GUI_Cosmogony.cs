@@ -3,11 +3,11 @@ using System.Collections;
 
 using SimDim;
 
-public class Cosmogony : MonoBehaviour 
+public class GUI_Cosmogony: MonoBehaviour 
 {
 	private SimDim.Plan theWorld;  // Later, it must be a list
 	
-	private bool isPausing=false;
+	private float TimeSpeed = 1.0f;
 	
 	private float NbF = 25.0f;
 	private float Nb2 = 5.0f;
@@ -23,39 +23,22 @@ public class Cosmogony : MonoBehaviour
 		
 		SimDim.Plan theFlatlandWorld = new SimDim.Plan("FLATLAND");
 		this.theWorld = theFlatlandWorld;
-		
-		//Creation of creatures:
-		//SimDim.SquareCreature Adam = new SimDim.SquareCreature(theFlatlandWorld);
-		
-		
-		//Creation of food spots:
-		//new SimDim.Food(theFlatlandWorld);
-		//new SimDim.Food(theFlatlandWorld);
-		//new SimDim.Food(theFlatlandWorld);
-		//new SimDim.Food(theFlatlandWorld);
-		//new SimDim.Food(theFlatlandWorld);
-		//new SimDim.Food(theFlatlandWorld);
-		
-		//new SimDim.Food(theFlatlandWorld);
-		//new SimDim.Food(theFlatlandWorld);
-		//new SimDim.Food(theFlatlandWorld);
+			
  	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		
-//		if(this.isPausing)
-//			Time.timeScale=0.001f;
-//		else
-//			Time.timeScale=1.0f;
-//	
+			
 	}
 	
 	
 	void OnGUI()
 	{
-		// this.isPausing = GUI.Toggle(new Rect( Screen.width*0.5f,Screen.height - 50,Screen.width*0.1f,50 ) , this.isPausing,"Pause");
+		
+		this.TimeSpeed = GUI.HorizontalSlider( new Rect( 0,Screen.height-50,Screen.width*0.1f,50 ), this.TimeSpeed, 0.1f, 10.0f );
+		GUI.Label( new Rect( 50,Screen.height-50,Screen.width*0.1f,50 ), "Speed="+this.TimeSpeed);
+		Time.timeScale = this.TimeSpeed;
 		
 		
 		//Manual Creation

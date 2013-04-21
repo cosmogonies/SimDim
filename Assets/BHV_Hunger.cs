@@ -5,20 +5,10 @@ using System.Collections.Generic;
 using SimDim;
 
 
-public class BHV_Eat : MonoBehaviour 
+public class BHV_Hunger : MonoBehaviour 
 {
-	
 	public float Hunger = 0.5f;  // ratio. 1 is starving at max, 0 is full.
-	
-	//TODO later: timeit with real meaningfull seconds.
-	
-	// Use this for initialization
-	void Start () 
-	{
-	
-	}
-	
-	// Update is called once per frame
+			
 	void Update () 
 	{
 		// As the time flows the stomach empty itself.	
@@ -50,7 +40,7 @@ public class BHV_Eat : MonoBehaviour
 		float minDistance = Vector3.Distance(this.transform.position, nearestFood.root.transform.position);
 		foreach( SimDim.Food FoodCandidate in _TheList)
 		{
-			float currentDistance = Vector3.Distance(this.transform.position, nearestFood.root.transform.position);
+			float currentDistance = Vector3.Distance(this.transform.position, FoodCandidate.root.transform.position);
 			
 			if( currentDistance <  minDistance )
 			{

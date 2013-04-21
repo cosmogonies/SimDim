@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using SimDim;
 
-public class BHV_See : MonoBehaviour 
+public class BHV_Vision : MonoBehaviour 
 {
 	//The see behaviour manage how a living creature know its environment
 	

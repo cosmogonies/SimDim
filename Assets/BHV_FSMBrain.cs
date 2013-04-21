@@ -4,31 +4,31 @@ using System.Collections.Generic;
 
 using SimDim;
 
-public class BHV_FSMBrain_Square : MonoBehaviour 
+public class BHV_FSMBrain : MonoBehaviour 
 {
 	public SimDim.LivingCreature theLivingCreature;
 	
 	//private List<MonoBehaviour> StatusList;
-	public BHV_See Sight;  // this Eye pattern is evil
+	public BHV_Vision Sight;  // this Eye pattern is evil
 	
 	public BHV_Social Empathy;
 	
-	BHV_Eat Hunger;
+	BHV_Hunger Hunger;
 	
-	BHV_Walk Locomotion;
+	BHV_Motion Locomotion;
 	
 	
 	public void Start () 
 	{
 		//this.StatusList = new List<MonoBehaviour>();
 	
-		this.Hunger  = this.gameObject.AddComponent<BHV_Eat>() as BHV_Eat;
-		this.Sight  = this.gameObject.AddComponent<BHV_See>() as BHV_See;
+		this.Hunger  = this.gameObject.AddComponent<BHV_Hunger>() as BHV_Hunger;
+		this.Sight  = this.gameObject.AddComponent<BHV_Vision>() as BHV_Vision;
 
 		this.Sight.Belonging = theLivingCreature.belonging;
 		
 		
-		this.Locomotion  = this.gameObject.AddComponent<BHV_Walk>() as BHV_Walk;
+		this.Locomotion  = this.gameObject.AddComponent<BHV_Motion>() as BHV_Motion;
 		
 		this.Empathy = this.gameObject.AddComponent<BHV_Social>() as BHV_Social;
 	}
