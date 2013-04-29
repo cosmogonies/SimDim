@@ -102,6 +102,10 @@ namespace SimDim
 			this.Body.Add( shape );
 			shape.transform.parent = this.root.transform;
 			
+			shape.transform.localScale *= 0.1f;
+			
+			//MonoBehaviour.Destroy(shape.GetComponent<BoxCollider>());
+			
 			this.root.name="food_"+_Dim.Population.Count;
 			
 			//Debug.Log ( System.Guid.NewGuid() );
@@ -132,21 +136,34 @@ namespace SimDim
 	public class LivingCreature:Matter
 	{
 		int NbSide;
-		public List<Vector3> DangerAngles;
+		public List<Vector3> Angles;
 		//Dictionary<int,float> Ugliness;
+		public float Uglyness=0.0f;
+		
 		public string Name;
 		public Dimension belonging;
-			
+		
+		public float Age=10.0f; //Age is scale
+		//private float DEFAULT_SCALE = 10.0f;
+		
 		GameObject Eye;
-		private float DEFAULT_SCALE = 10.0f;
 		
 		public LivingCreature(Dimension _Dim, int _NbSide):base(_Dim)
 		{
 			this.belonging = _Dim;
 			this.NbSide = _NbSide;
-			this.DangerAngles = new List<Vector3>();
+			Angles = new List<Vector3>();
 			
 			this.Body = new List<GameObject>();
+			
+			//Age
+			this.Age = UnityEngine.Random.Range(10.0f,30.0f);
+			SphereCollider sc = this.root.AddComponent<SphereCollider>();
+			sc.radius=0.1f*this.Age;
+			
+			//Uglyness
+			if(UnityEngine.Random.value<0.3f) // 30% chance not to be regular
+				this.Uglyness = UnityEngine.Random.Range(0.1f,0.3f);
 			
 			this.createShape();
 			
@@ -157,61 +174,49 @@ namespace SimDim
 		}
 		
 		
-		private void giveSightBehaviour(GameObject _Eye)
-		{//Every living create can see others.
-			
-			BHV_Vision newBehaviour  = this.root.AddComponent<BHV_Vision>() as BHV_Vision;
-			newBehaviour.TheEye = _Eye;
-			newBehaviour.Belonging = this.belonging;
-		}
+		
 		
 		private void createShape()
-		{
-			//GameObject shape = UnityEngine.GameObject.CreatePrimitive(PrimitiveType.Cube);
-			//shape.transform.parent = this.root.transform;
-			//shape.transform.localScale *= 10f; //see them better
-			if(this.NbSide==2)
-				this.root.name="Line"+this.belonging.Population.Count;
-			if(this.NbSide==3)
-				this.root.name="Triangle"+this.belonging.Population.Count;
-			if(this.NbSide==4)
-				this.root.name="Square"+this.belonging.Population.Count;
-			if(this.NbSide==5)
-			{
-				this.root.name="Pentagon"+this.belonging.Population.Count;
-				this.NbSide = UnityEngine.Random.Range(5,10);
-			}
-			
-			// SHAPE CREATION
-			float radius =1.0f;
+		{   // SHAPE CREATION
+			float radius =0.1f*this.Age;
 			Vector3[] AngleCoord = new Vector3[this.NbSide];
 			float Angle = Mathf.PI*2 / this.NbSide;
+			List<float> Angles = new List<float>(this.NbSide);
+			
+			for(int i=0;i<AngleCoord.Length;i++)
+				Angles.Add(Angle*i);
+
+			if(this.Uglyness>0.0f)
+			{ //Uglyness Management, offseting regular angles..
+				Angles[0] = this.Uglyness;
+				Angles[1] = Angles[1] - this.Uglyness;
+			}
+			
 			for(int i=1;i<=AngleCoord.Length;i++)
 			{
-				float currentAngle = Angle*i;
+				float currentAngle = Angles[i-1];
 				AngleCoord[i-1] = new Vector3( radius * Mathf.Cos(currentAngle) , 0, radius * Mathf.Sin(currentAngle) );
 				
 				if(this.NbSide==2) //Patch to have lines forward vector in front of their point.
 					AngleCoord[i-1] = new Vector3( radius * Mathf.Sin(currentAngle) , 0, radius * Mathf.Cos(currentAngle) );
-				
-				DangerAngles.Add(AngleCoord[i-1]);
 			}
 			for(int i=0;i<AngleCoord.Length;i++)
 			{
-				for(int j=0;j<this.DEFAULT_SCALE;j++)
+				for(int j=0;j<this.Age;j++)
 				{	
 					int nextIndex = i+1;
 					if(i>=AngleCoord.Length-1)
 						nextIndex=0;
 					
-					//Debug.Log(i+" "+nextIndex);
-					Vector3 offset = (AngleCoord[nextIndex] - AngleCoord[i] ) / this.DEFAULT_SCALE;
+					Vector3 offset = (AngleCoord[nextIndex] - AngleCoord[i] ) / this.Age;
 					
 					GameObject SubShape = UnityEngine.GameObject.CreatePrimitive(PrimitiveType.Cube);
 					SubShape.name = this.root.name+"_Sub_"+i+"x"+j;
 					SubShape.transform.position = AngleCoord[i] + j*offset;
 					SubShape.transform.parent = this.root.transform;	
 					SubShape.transform.localScale *= 0.1f;
+					
+					MonoBehaviour.Destroy(SubShape.GetComponent<BoxCollider>());
 					
 					//Temporarily, shading them in Green to see them better.
 					Material greenMat = new Material(Shader.Find("Diffuse"));
@@ -224,43 +229,55 @@ namespace SimDim
 			this.root.transform.position = this.belonging.giveAvailableLocation();
 			
 		}
+		
+		private void giveSightBehaviour(GameObject _Eye)
+		{//Every living create can see others.
+			BHV_Vision newBehaviour  = this.root.AddComponent<BHV_Vision>() as BHV_Vision;
+			newBehaviour.TheEye = _Eye;
+			newBehaviour.Belonging = this.belonging;
+		}
+				
+		
 	}
+
+	public class LineCreature : LivingCreature
+	{
+		public LineCreature(Dimension _Dim): base(_Dim,2)
+		{
+			this.Name = "Line_"; //+uuid		
+			this.root.name="Line"+this.belonging.Population.Count;
+			//Get a Job
+		}
+	}
+	
+	public class TriangleCreature : LivingCreature
+	{
+		public TriangleCreature(Dimension _Dim): base(_Dim,3)
+		{
+			this.Name = "Triangle_"; //+uuid
+			this.root.name="Triangle"+this.belonging.Population.Count;
+			//Get a Job
+		}
+	}	
 	
 	//Create Square
 	public class SquareCreature : LivingCreature
 	{
 		public SquareCreature(Dimension _Dim): base(_Dim,4)
 		{
-			this.Name = "Square_"; //+uuid		
+			this.Name = "Square_"; //+uuid
+			this.root.name="Square"+this.belonging.Population.Count;
 			//Get a Job
 		}
 	}
 	
-	
-	public class LineCreature : LivingCreature
-	{
-		public LineCreature(Dimension _Dim): base(_Dim,2)
-		{
-			this.Name = "Line_"; //+uuid		
-			//Get a Job
-		}
-	}
-	
-	
-	public class TriangleCreature : LivingCreature
-	{
-		public TriangleCreature(Dimension _Dim): base(_Dim,3)
-		{
-			this.Name = "Triangle_"; //+uuid		
-			//Get a Job
-		}
-	}	
-		
 	public class PentagonCreature : LivingCreature
 	{
-		public PentagonCreature(Dimension _Dim): base(_Dim,5)
+		public PentagonCreature(Dimension _Dim): base(_Dim, UnityEngine.Random.Range(5,10) )
 		{
-			this.Name = "Pentagon_"; //+uuid		
+			this.Name = "Pentagon_"; //+uuid
+			this.root.name="Pentagon"+this.belonging.Population.Count;
+			//this.NbSide = UnityEngine.Random.Range(5,10);
 			//Get a Job
 		}
 	}	

@@ -60,7 +60,7 @@ public class BHV_Vision : MonoBehaviour
 			if(currentItem.root != this.gameObject)
 			{
 				
-				float d = Vector3.Distance(currentItem.root.transform.position, EyePosition);
+				float d = Vector3.Distance(currentItem.root.transform.position, this.gameObject.transform.position);
 				
 				//Collision detection (TODO: not the right place)
 				if(currentItem.GetType().ToString() != "SimDim.Food")
@@ -68,7 +68,7 @@ public class BHV_Vision : MonoBehaviour
 					SimDim.LivingCreature currentSeenGuy = currentItem as SimDim.LivingCreature;
 					
 					//behaviour from Social, but call here to optimize loop:
-					if(d<2.0f)
+					if(d< 0.1f*currentSeenGuy.Age )
 					{	//Contact Management.
 						BHV_Social comp = this.gameObject.GetComponent<BHV_Social>() as BHV_Social; //mayve, LATER, we can manage food like any kills.
 						comp.kill(currentSeenGuy);

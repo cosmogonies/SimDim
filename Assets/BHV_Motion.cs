@@ -27,9 +27,7 @@ public class BHV_Motion : MonoBehaviour {
 		float posX = UnityEngine.Random.Range(-1.0F*this.StepLength, this.StepLength); 
 		float posY = 0;
 		float posZ = UnityEngine.Random.Range(-1.0F*this.StepLength, this.StepLength); 		
-		
 		//this.transform.Rotate(posX,0,0);
-		
 		return new Vector3(posX,posY,posZ);
 	}
 	

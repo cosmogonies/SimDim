@@ -36,22 +36,17 @@ public class BHV_FSMBrain : MonoBehaviour
 	
 	void Update () 
 	{
-		//Idea: speed is hunger
-		this.Locomotion.StepLength = this.Hunger.Hunger;
-		
+		this.Locomotion.StepLength = this.Hunger.Hunger;  //speed is hunger
 		
 		if(this.Hunger.isHungry())
 		{
-			//When we are hungry we look for food.
-			
+			//When we are hungry we look for food.	
 			if( this.Sight.FoodList.Count==0 )
-			{
-				//Debug.Log (this.gameObject.name+"No food at sight, let's random walk");
+			{  //No food at sight, let's random walk
 				this.Locomotion.walkAtRandom();
 			}
 			else
-			{
-				//Searching nearest Food...
+			{   //Searching nearest Food...
 				SimDim.Food nearestFood = this.Hunger.lookForFood(this.Sight.FoodList);
 				
 				//Going forward Nearest food:
@@ -59,12 +54,13 @@ public class BHV_FSMBrain : MonoBehaviour
 				//Debug.Log (this.gameObject.name+" is at "+DistanceToGoal+"m from its goal");
 				if(distance < this.Locomotion.StepLength)
 				{	//Start Eating
-					Debug.Log (this.gameObject.name+" has reached its goal");
+					//Debug.Log (this.gameObject.name+" has reached its goal");
 					
 					this.Hunger.eatFood(nearestFood);
 					//this.Sight.FoodList.Remove(nearestFood); // not accurate. Must be removed from sight of anybodies.
 					//this.Sight.currentVision.Remove(nearestFood);
-					theLivingCreature.belonging.destroyMatter(nearestFood);
+					
+					//theLivingCreature.belonging.destroyMatter(nearestFood);
 				}
 				
 			}

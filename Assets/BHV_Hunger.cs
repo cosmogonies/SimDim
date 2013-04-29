@@ -8,7 +8,13 @@ using SimDim;
 public class BHV_Hunger : MonoBehaviour 
 {
 	public float Hunger = 0.5f;  // ratio. 1 is starving at max, 0 is full.
-			
+
+	void Start () 
+	{	
+		this.Hunger = UnityEngine.Random.value;
+	}	
+	
+	
 	void Update () 
 	{
 		// As the time flows the stomach empty itself.	
@@ -29,8 +35,10 @@ public class BHV_Hunger : MonoBehaviour
 	public void eatFood(SimDim.Food _targetFood)
 	{	
 		this.Hunger=0; // End of starvation
-		_targetFood.beEaten();
-		Debug.Log (this.gameObject.name+" does not starve anymore.");
+		_targetFood.beEaten();   //TODO:  for blog: eat (_victim) or beEaten(_killer)
+		Debug.Log (this.gameObject.name+" eat "+_targetFood.root.name);
+		
+		_targetFood.belonging.destroyMatter(_targetFood);
 	}
 	
 
